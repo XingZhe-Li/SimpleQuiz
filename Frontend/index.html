@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/codes/script.js"></script>
+    <script defer src="/libs/alpine.js"></script>
+    <link rel="stylesheet" href="/codes/style.css">
+    <link rel="shortcut icon" href="/assets/note-beamed.svg" type="image/x-icon">
+    <title>Simple Quiz</title>
+</head>
+<body x-data="data">
+    <div class="play">
+        <div class="play-title">这首配乐来自以下?</div>
+        <div class="play-btn-container">
+            <template x-for="op in options">
+                <div class="play-btn btn" x-text="op" @click="choose(op)" :style="opBg(op)"></div>
+            </template>
+        </div>
+        <div class="player">
+            <img class="btn" src="/assets/play.svg"  x-show="!playing" @click="playToggle()">
+            <img class="btn" src="/assets/pause.svg" x-show="playing"  @click="playToggle()">
+            <input :value="playPercent" type="range" step="0.01"
+                @change="playPercent=$el.value;player.currentTime = playPercent*player.duration/100"
+                @focus="rangerFocus=true"
+                @blur="rangerFocus=false">
+            <div style="position:relative;">
+                <div class="player-vol btn" x-show="volset">
+                    <input value="100" type="range" 
+                        @input="player.volume = $el.value/100 ; volume = $el.value" 
+                        @blur="volset=false"/>
+                </div>
+                <img class="btn" src="/assets/volume-0.svg" x-show="volume==0" @mousedown="volSet()">
+                <img class="btn" src="/assets/volume-1.svg" x-show="volume < 50 && volume > 0" @mousedown="volSet()">
+                <img class="btn" src="/assets/volume-2.svg" x-show="volume>=50" @mousedown="volSet()">
+            </div>
+        </div>
+        <div class="play-next btn" x-show="choice!=''" @click="testFetch()">下一首</div>
+        <div class="play-score btn" @click="displayModeChange()"
+            x-text="['本次数据','历史数据'][displayMode]">本次数据</div>
+        <div class="play-save btn" @click="pushBoard()"
+            :style="['','--bg:#01bd7590'][pushAble]">存入历史</div>
+    </div>
+    <div class="scorepad">
+        <div class="scorepad-title" :style="statTitle" x-text="['本次统计','历次统计'][displayMode]">本次统计分析</div>
+        <template x-for="item in renderPad">
+            <div class="scorepad-item" :style="item[1]">
+                <div class="scorepad-item-name" x-text="item[0]"></div>
+                <div class="grow"></div>
+                <div class="scorepad-item-num" x-text="item[2]"></div>
+            </div>
+        </template>
+        <div class="fill-80"></div>
+        <div class="scorepad-btn btn" @click="changeDisplayMode()"
+            x-text="['正确率(1)','正确率(2)','正确数','测试数'][sortby]">正确率</div>
+    </div>
+</body>
+</html>
